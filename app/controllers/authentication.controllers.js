@@ -8,7 +8,18 @@ const usuarios = [{
 }]
 
 async function login(req, res){
-
+    console.log(req.body);
+    const user = req.body.user;
+    const password = req.body.password;
+    if (!user || !password) {
+        return res.status(400).send({status:"Error",message:"Los campos estan incompletos"})
+    }
+    const usuarioARevisar = usuarios.find(usuario => usuarios.user === user);
+    if(!usuarioARevisar){
+        return res.status(400).send({status:"Error",message:"Error durante login"})
+    }
+    const loginCorrecto = await bcryptjs.compare(password,usuarioARevisar.password);
+    console.log(loginCorrecto)
 }
 
 async function register(req, res){
@@ -17,13 +28,13 @@ async function register(req, res){
     const email = req.body.email;
     const password = req.body.password;
     if (!user || !email || !password) {
-        res.status(400).send({
+        return res.status(400).send({
             status:"Error", 
             message:"Los campos estan incompletos"})
     }
     const usuarioARevisar = usuarios.find(usuario => usuarios.user === user);
     if (usuarioARevisar) {
-        res.status(400).send({
+        return res.status(400).send({
             status:"Error", 
             message:"Este usuario ya existe"})
     } 
@@ -34,7 +45,7 @@ async function register(req, res){
     }
     usuarios.push(nuevoUsuario),
     console.log(usuarios);
-    res.status(201).send({status: "ok", message: 'Usuario ${nuevoUsuario.user} agregado', redirect:"/"})
+    return res.status(201).send({status: "ok", message: 'Usuario ${nuevoUsuario.user} agregado', redirect:"/"})
 }
 
 export const methods = {
